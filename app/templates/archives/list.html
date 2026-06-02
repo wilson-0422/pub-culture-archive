@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}档案列表 - 文化遗产档案系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>档案列表</h1>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('archives.create') }}" class="btn btn-primary">新建档案</a>
+    {% endif %}
+</div>
+
+<div class="search-bar">
+    <form method="get" action="{{ url_for('archives.list_archives') }}">
+        <input type="text" name="keyword" value="{{ keyword }}" placeholder="搜索标题、描述、年代、地点..." class="search-input">
+        <select name="category_id" class="search-select">
+            <option value="">全部分类</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if current_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" class="search-select">
+            <option value="">全部状态</option>
+            <option value="draft" {% if current_status == 'draft' %}selected{% endif %}>草稿</option>
+            <option value="published" {% if current_status == 'published' %}selected{% endif %}>已发布</option>
+            <option value="archived" {% if current_status == 'archived' %}selected{% endif %}>已归档</option>
+        </select>
+        <button type="submit" class="btn btn-primary">搜索</button>
+    </form>
+</div>
+
+<div class="archive-grid">
+    {% for archive in archives %}
+    <a href="{{ url_for('archives.detail', archive_id=archive.id) }}" class="archive-card">
+        {% if archive.image_url %}
+        <div class="archive-card-image">
+            <img src="{{ archive.image_url }}" alt="{{ archive.title }}">
+        </div>
+        {% else %}
+        <div class="archive-card-image placeholder">
+            <span>无图片</span>
+        </div>
+        {% endif %}
+        <div class="archive-card-body">
+            <h3>{{ archive.title }}</h3>
+            <p class="archive-era">{{ archive.era }}</p>
+            <p class="archive-location">{{ archive.location }}</p>
+            <span class="badge badge-{{ archive.status }}">
+                {% if archive.status == 'draft' %}草稿
+                {% elif archive.status == 'published' %}已发布
+                {% elif archive.status == 'archived' %}已归档
+                {% else %}{{ archive.status }}{% endif %}
+            </span>
+        </div>
+    </a>
+    {% else %}
+    <p class="empty-message">暂无档案记录</p>
+    {% endfor %}
+</div>
+
+{% if pagination.pages > 1 %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for('archives.list_archives', page=pagination.prev_num, keyword=keyword, category_id=current_category, status=current_status) }}" class="btn btn-outline">上一页</a>
+    {% endif %}
+    <span class="page-info">第 {{ pagination.page }} / {{ pagination.pages }} 页</span>
+    {% if pagination.has_next %}
+    <a href="{{ url_for('archives.list_archives', page=pagination.next_num, keyword=keyword, category_id=current_category, status=current_status) }}" class="btn btn-outline">下一页</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %} {% block title %}合集列表 - 文化遗产档案系统{%
+endblock %} {% block content %}
+<div class="page-header">
+  <h1>合集列表</h1>
+  {% if current_user.is_authenticated %}
+  <a href="{{ url_for('collections.create') }}" class="btn btn-primary"
+    >新建合集</a
+  >
+  {% endif %}
+</div>
+
+<div class="collection-grid">
+  {% for collection in collections %}
+  <a
+    href="{{ url_for('collections.detail', collection_id=collection.id) }}"
+    class="collection-card"
+  >
+    <h3>{{ collection.name }}</h3>
+    <p>
+      {{ collection.description[:100] if collection.description else '暂无描述'
+      }}
+    </p>
+    <div class="collection-meta">
+      <span>{{ collection.archive_items|length }} 件档案</span>
+      {% if collection.creator %}
+      <span>创建者：{{ collection.creator.display_name }}</span>
+      {% endif %}
+    </div>
+  </a>
+  {% else %}
+  <p class="empty-message">暂无合集</p>
+  {% endfor %}
+</div>
+
+{% if pagination.pages > 1 %}
+<div class="pagination">
+  {% if pagination.has_prev %}
+  <a
+    href="{{ url_for('collections.list_collections', page=pagination.prev_num) }}"
+    class="btn btn-outline"
+    >上一页</a
+  >
+  {% endif %}
+  <span class="page-info"
+    >第 {{ pagination.page }} / {{ pagination.pages }} 页</span
+  >
+  {% if pagination.has_next %}
+  <a
+    href="{{ url_for('collections.list_collections', page=pagination.next_num) }}"
+    class="btn btn-outline"
+    >下一页</a
+  >
+  {% endif %}
+</div>
+{% endif %} {% endblock %}

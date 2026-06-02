@@ -1,0 +1,101 @@
+{% extends "base.html" %} {% block title %}{{ collection.name }} - 合集详情 -
+文化遗产档案系统{% endblock %} {% block content %}
+<div class="detail-page">
+  <div class="detail-header">
+    <a href="{{ url_for('collections.list_collections') }}" class="back-link"
+      >&larr; 返回合集列表</a
+    >
+    {% if current_user.is_authenticated %}
+    <div class="detail-actions">
+      <a
+        href="{{ url_for('collections.edit', collection_id=collection.id) }}"
+        class="btn btn-outline"
+        >编辑</a
+      >
+      <form
+        method="post"
+        action="{{ url_for('collections.delete', collection_id=collection.id) }}"
+        onsubmit="return confirm('确定要删除此合集吗？')"
+      >
+        <button type="submit" class="btn btn-danger">删除</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="collection-detail">
+    <h1>{{ collection.name }}</h1>
+    <p class="collection-desc">{{ collection.description or '暂无描述' }}</p>
+    <div class="collection-meta">
+      <span>共 {{ collection.archive_items|length }} 件档案</span>
+      {% if collection.creator %}
+      <span>创建者：{{ collection.creator.display_name }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if current_user.is_authenticated %}
+  <div class="add-to-collection">
+    <h3>添加档案到合集</h3>
+    <form
+      method="post"
+      action="{{ url_for('collections.add_archive', collection_id=collection.id) }}"
+    >
+      <div class="form-row">
+        <input
+          type="number"
+          name="archive_id"
+          placeholder="输入档案ID"
+          required
+        />
+        <button type="submit" class="btn btn-primary">添加</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <h2>合集中的档案</h2>
+  <div class="archive-grid">
+    {% for archive in collection.archive_items %}
+    <div class="archive-card-wrapper">
+      <a
+        href="{{ url_for('archives.detail', archive_id=archive.id) }}"
+        class="archive-card"
+      >
+        {% if archive.image_url %}
+        <div class="archive-card-image">
+          <img src="{{ archive.image_url }}" alt="{{ archive.title }}" />
+        </div>
+        {% else %}
+        <div class="archive-card-image placeholder">
+          <span>无图片</span>
+        </div>
+        {% endif %}
+        <div class="archive-card-body">
+          <h3>{{ archive.title }}</h3>
+          <p class="archive-era">{{ archive.era }}</p>
+          <p class="archive-location">{{ archive.location }}</p>
+        </div>
+      </a>
+      {% if current_user.is_authenticated %}
+      <form
+        method="post"
+        action="{{ url_for('collections.remove_archive', collection_id=collection.id, archive_id=archive.id) }}"
+        class="remove-form"
+      >
+        <button
+          type="submit"
+          class="btn btn-sm btn-danger"
+          onclick="return confirm('确定要从此合集中移除吗？')"
+        >
+          移除
+        </button>
+      </form>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="empty-message">合集中暂无档案</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

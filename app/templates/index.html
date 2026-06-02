@@ -1,0 +1,70 @@
+{% extends "base.html" %} {% block title %}首页 - 文化遗产档案系统{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_archives }}</div>
+      <div class="stat-label">档案总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ total_categories }}</div>
+      <div class="stat-label">分类总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ total_collections }}</div>
+      <div class="stat-label">合集总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ status_counts.get('published', 0) }}</div>
+      <div class="stat-label">已发布</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>最近档案</h2>
+    <div class="archive-grid">
+      {% for archive in recent_archives %}
+      <a
+        href="{{ url_for('archives.detail', archive_id=archive.id) }}"
+        class="archive-card"
+      >
+        {% if archive.image_url %}
+        <div class="archive-card-image">
+          <img src="{{ archive.image_url }}" alt="{{ archive.title }}" />
+        </div>
+        {% else %}
+        <div class="archive-card-image placeholder">
+          <span>无图片</span>
+        </div>
+        {% endif %}
+        <div class="archive-card-body">
+          <h3>{{ archive.title }}</h3>
+          <p class="archive-era">{{ archive.era }}</p>
+          <p class="archive-location">{{ archive.location }}</p>
+          <span class="badge badge-{{ archive.status }}">
+            {% if archive.status == 'draft' %}草稿 {% elif archive.status ==
+            'published' %}已发布 {% elif archive.status == 'archived' %}已归档
+            {% else %}{{ archive.status }}{% endif %}
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>分类浏览</h2>
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a
+        href="{{ url_for('categories.detail', category_id=cat.id) }}"
+        class="category-card"
+      >
+        <h3>{{ cat.name }}</h3>
+        <p>{{ cat.archives.count() }} 件档案</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

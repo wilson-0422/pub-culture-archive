@@ -1,0 +1,73 @@
+{% extends "base.html" %} {% block title %}{{ category.name }} - 分类详情 -
+文化遗产档案系统{% endblock %} {% block content %}
+<div class="detail-page">
+  <div class="detail-header">
+    <a href="{{ url_for('categories.list_categories') }}" class="back-link"
+      >&larr; 返回分类列表</a
+    >
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <form
+      method="post"
+      action="{{ url_for('categories.delete', category_id=category.id) }}"
+      onsubmit="return confirm('确定要删除此分类吗？')"
+    >
+      <button type="submit" class="btn btn-danger">删除分类</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="category-detail">
+    <h1>{{ category.name }}</h1>
+    <p class="category-desc">{{ category.description or '暂无描述' }}</p>
+  </div>
+
+  <h2>该分类下的档案</h2>
+  <div class="archive-grid">
+    {% for archive in archives %}
+    <a
+      href="{{ url_for('archives.detail', archive_id=archive.id) }}"
+      class="archive-card"
+    >
+      {% if archive.image_url %}
+      <div class="archive-card-image">
+        <img src="{{ archive.image_url }}" alt="{{ archive.title }}" />
+      </div>
+      {% else %}
+      <div class="archive-card-image placeholder">
+        <span>无图片</span>
+      </div>
+      {% endif %}
+      <div class="archive-card-body">
+        <h3>{{ archive.title }}</h3>
+        <p class="archive-era">{{ archive.era }}</p>
+        <p class="archive-location">{{ archive.location }}</p>
+      </div>
+    </a>
+    {% else %}
+    <p class="empty-message">该分类下暂无档案</p>
+    {% endfor %}
+  </div>
+
+  {% if pagination.pages > 1 %}
+  <div class="pagination">
+    {% if pagination.has_prev %}
+    <a
+      href="{{ url_for('categories.detail', category_id=category.id, page=pagination.prev_num) }}"
+      class="btn btn-outline"
+      >上一页</a
+    >
+    {% endif %}
+    <span class="page-info"
+      >第 {{ pagination.page }} / {{ pagination.pages }} 页</span
+    >
+    {% if pagination.has_next %}
+    <a
+      href="{{ url_for('categories.detail', category_id=category.id, page=pagination.next_num) }}"
+      class="btn btn-outline"
+      >下一页</a
+    >
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

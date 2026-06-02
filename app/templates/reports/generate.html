@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block title %}生成报告 - 文化遗产档案系统{%
+endblock %} {% block content %}
+<div class="form-page">
+  <h1>生成报告</h1>
+
+  <div class="report-section">
+    <h2>导出 CSV 档案报告</h2>
+    <p>导出所有档案数据为 CSV 格式，可按分类和状态筛选。</p>
+    <form
+      method="get"
+      action="{{ url_for('reports.export_csv') }}"
+      class="report-form"
+    >
+      <div class="form-row">
+        <select name="category_id" class="search-select">
+          <option value="">全部分类</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+        <select name="status" class="search-select">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="published">已发布</option>
+          <option value="archived">已归档</option>
+        </select>
+        <button type="submit" class="btn btn-primary">导出 CSV</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="report-section">
+    <h2>导出统计摘要</h2>
+    <p>导出系统统计摘要为纯文本格式，包含档案总数、分类数量、各状态数量等。</p>
+    <a href="{{ url_for('reports.export_summary') }}" class="btn btn-primary"
+      >导出摘要</a
+    >
+  </div>
+</div>
+{% endblock %}

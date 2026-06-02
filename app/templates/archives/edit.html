@@ -1,0 +1,121 @@
+{% extends "base.html" %} {% block title %}编辑档案 - 文化遗产档案系统{%
+endblock %} {% block content %}
+<div class="form-page">
+  <h1>编辑档案</h1>
+  <form method="post" enctype="multipart/form-data" class="archive-form">
+    <div class="form-group">
+      <label for="title">标题 <span class="required">*</span></label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        value="{{ archive.title }}"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="category_id">分类</label>
+      <select id="category_id" name="category_id">
+        <option value="">请选择分类</option>
+        {% for cat in categories %}
+        <option
+          value="{{ cat.id }}"
+          {%
+          if
+          archive.category_id=""
+          ="cat.id"
+          %}selected{%
+          endif
+          %}
+        >
+          {{ cat.name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="era">年代</label>
+        <input type="text" id="era" name="era" value="{{ archive.era }}" />
+      </div>
+      <div class="form-group">
+        <label for="location">地点</label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          value="{{ archive.location }}"
+        />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="description">详细描述</label>
+      <textarea id="description" name="description" rows="6">
+{{ archive.description }}</textarea
+      >
+    </div>
+    <div class="form-group">
+      <label for="image">图片</label>
+      {% if archive.image_url %}
+      <p>
+        当前图片：<img
+          src="{{ archive.image_url }}"
+          alt=""
+          class="current-image"
+        />
+      </p>
+      {% endif %}
+      <input type="file" id="image" name="image" accept="image/*" />
+    </div>
+    <div class="form-group">
+      <label for="status">状态</label>
+      <select id="status" name="status">
+        <option
+          value="draft"
+          {%
+          if
+          archive.status=""
+          ="draft"
+          %}selected{%
+          endif
+          %}
+        >
+          草稿
+        </option>
+        <option
+          value="published"
+          {%
+          if
+          archive.status=""
+          ="published"
+          %}selected{%
+          endif
+          %}
+        >
+          已发布
+        </option>
+        <option
+          value="archived"
+          {%
+          if
+          archive.status=""
+          ="archived"
+          %}selected{%
+          endif
+          %}
+        >
+          已归档
+        </option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">保存</button>
+      <a
+        href="{{ url_for('archives.detail', archive_id=archive.id) }}"
+        class="btn btn-outline"
+        >取消</a
+      >
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %} {% block title %}分类浏览 - 文化遗产档案系统{%
+endblock %} {% block content %}
+<div class="page-header">
+  <h1>分类浏览</h1>
+  {% if current_user.is_authenticated %}
+  <button
+    class="btn btn-primary"
+    onclick="
+      document.getElementById('new-category-form').style.display = 'block'
+    "
+  >
+    新建分类
+  </button>
+  {% endif %}
+</div>
+
+{% if current_user.is_authenticated %}
+<div id="new-category-form" style="display: none" class="inline-form">
+  <form method="post" action="{{ url_for('categories.create') }}">
+    <div class="form-row">
+      <input type="text" name="name" placeholder="分类名称" required />
+      <select name="parent_id">
+        <option value="">无父分类</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="description" placeholder="描述（可选）" />
+      <button type="submit" class="btn btn-primary">创建</button>
+      <button
+        type="button"
+        class="btn btn-outline"
+        onclick="
+          document.getElementById('new-category-form').style.display = 'none'
+        "
+      >
+        取消
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="category-tree">
+  {% macro render_tree(nodes) %} {% for node in nodes %}
+  <div class="tree-node">
+    <div class="tree-item">
+      <a
+        href="{{ url_for('categories.detail', category_id=node.id) }}"
+        class="tree-link"
+      >
+        <span class="tree-icon">&#128193;</span>
+        {{ node.name }}
+      </a>
+      {% if node.children %}
+      <span class="tree-count">{{ node.children|length }} 个子分类</span>
+      {% endif %}
+    </div>
+    {% if node.children %}
+    <div class="tree-children">{{ render_tree(node.children) }}</div>
+    {% endif %}
+  </div>
+  {% endfor %} {{ render_tree(tree) }}
+</div>
+{% endblock %}

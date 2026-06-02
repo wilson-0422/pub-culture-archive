@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% block title %}{{ archive.title }} -
+文化遗产档案系统{% endblock %} {% block content %}
+<div class="detail-page">
+  <div class="detail-header">
+    <a href="{{ url_for('archives.list_archives') }}" class="back-link"
+      >&larr; 返回列表</a
+    >
+    {% if current_user.is_authenticated and (current_user.is_admin() or
+    archive.created_by == current_user.id) %}
+    <div class="detail-actions">
+      <a
+        href="{{ url_for('archives.edit', archive_id=archive.id) }}"
+        class="btn btn-outline"
+        >编辑</a
+      >
+      <form
+        method="post"
+        action="{{ url_for('archives.delete', archive_id=archive.id) }}"
+        style="display: inline"
+        onsubmit="return confirm('确定要删除此档案吗？')"
+      >
+        <button type="submit" class="btn btn-danger">删除</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="detail-content">
+    <div class="detail-image">
+      {% if archive.image_url %}
+      <img src="{{ archive.image_url }}" alt="{{ archive.title }}" />
+      {% else %}
+      <div class="placeholder-image">暂无图片</div>
+      {% endif %}
+    </div>
+    <div class="detail-info">
+      <h1>{{ archive.title }}</h1>
+      <div class="detail-meta">
+        <div class="meta-item">
+          <span class="meta-label">分类：</span>
+          <span class="meta-value">
+            {% if archive.category %}
+            <a
+              href="{{ url_for('categories.detail', category_id=archive.category.id) }}"
+              >{{ archive.category.name }}</a
+            >
+            {% else %}未分类{% endif %}
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">年代：</span>
+          <span class="meta-value">{{ archive.era or '未知' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">地点：</span>
+          <span class="meta-value">{{ archive.location or '未知' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">状态：</span>
+          <span class="badge badge-{{ archive.status }}">
+            {% if archive.status == 'draft' %}草稿 {% elif archive.status ==
+            'published' %}已发布 {% elif archive.status == 'archived' %}已归档
+            {% else %}{{ archive.status }}{% endif %}
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">创建时间：</span>
+          <span class="meta-value"
+            >{{ archive.created_at.strftime('%Y-%m-%d %H:%M') if
+            archive.created_at else '未知' }}</span
+          >
+        </div>
+        {% if archive.author %}
+        <div class="meta-item">
+          <span class="meta-label">创建者：</span>
+          <span class="meta-value">{{ archive.author.display_name }}</span>
+        </div>
+        {% endif %}
+      </div>
+      <div class="detail-description">
+        <h2>详细描述</h2>
+        <p>{{ archive.description or '暂无描述' }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
